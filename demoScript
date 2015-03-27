@@ -1,0 +1,16 @@
+ht-start-all-servers.sh local
+USE "/";
+CREATE NAMESPACE  "bigdata_experiment";
+USE bigdata_experiments;
+CREATE TABLE events (
+  device, INDEX device,
+  quantity,
+  timestamp, INDEX timestamp,
+  city, INDEX city,
+  state, INDEX state,
+  revenue, INDEX revenue,
+  source,
+  ACCESS GROUP default (device, quantity, timestamp, city, state, revenue, source));
+LOAD DATA INFILE ROW_KEY_COLUMN = "%05itemid" "simulated_data.tsv" INTO TABLE events;
+quit;
+ht-stop-servers.sh

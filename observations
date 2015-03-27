@@ -1,0 +1,73 @@
+**loading output for a small file:
+Loading 228 bytes of input data...
+
+0%   10   20   30   40   50   60   70   80   90   100%
+|----|----|----|----|----|----|----|----|----|----|
+***************************************************
+Load complete.
+
+  Elapsed time:  0.10 s
+Avg value size:  6.62 bytes
+  Avg key size:  5.00 bytes
+    Throughput:  2461.99 bytes/s (2300.54 bytes/s)
+   Total cells:  21
+    Throughput:  211.89 cells/s
+       Resends:  0
+hypertable> select * from events;
+00921	device	lumia
+00921	quantity	2
+00921	date	2015-02-27 05:00:00
+00921	city	varanasi
+00921	state	UP
+00921	revenue	200
+00921	source	facebook
+00988	device	ipad
+00988	quantity	1
+00988	date	2015-02-25 02:00:00
+00988	city	varanasi
+00988	state	UP
+00988	revenue	400
+00988	source	facebook
+0210 	device	moto-e
+0210 	quantity	1
+0210 	date	2015-02-27 07:30:00
+0210 	city	allahabad
+0210 	state	UP
+0210 	revenue	220
+0210 	source	facebook
+hypertable> select revenue from events where state = 'UP' and date =~ /^2015/;
+00921	revenue	200
+00988	revenue	400
+0210 	revenue	220
+hypertable> 
+
+**loading output for a large file (testing with some random data in the range of 10M)
+hypertable> load data infile ROW_KEY_COLUMN="%00000000itemid" "workspace/ht/simulated_data.tsv" into table events;
+
+Loading 712,784,335 bytes of input data...
+
+0%   10   20   30   40   50   60   70   80   90   100%
+|----|----|----|----|----|----|----|----|----|----|
+***************	************************************
+Load complete.
+
+  Elapsed time:  1545.64 s
+Avg value size:  8.06 bytes
+  Avg key size:  6.89 bytes
+    Throughput:  676819.82 bytes/s (461158.99 bytes/s)
+   Total cells:  70000000
+    Throughput:  45288.77 cells/s
+       Resends:  1105753
+hypertable> 
+
+**observations related to the loading time
+the load time is directly proportional to the size of the data being loaded.
+**observations related to the query respond timing 
+less time taken for specific queries like this:
+hypertable> select revenue from events where state = 'Karnataka' and device = 'lumia' and city = 'delhi' and timestamp =~ /^2006-06/;
+
+longer time taken for relatively less specific query like this:
+hypertable> select revenue from events where state = 'Uttar Pradesh' and timestamp =~ /^2010/;
+
+almost no time was taken for giving an output to a query where no entries match the database. such as:
+hypertable> select revenue from events where state = 'UP' and timestamp =~ /^2010/;

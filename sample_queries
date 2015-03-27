@@ -1,0 +1,4 @@
+ht-start-all-servers.sh
+USE "/";
+USE bigdata_experiments;
+SELECT revenue FROM events WHERE state = 'UP' AND timestamp =~ /^2015/;
