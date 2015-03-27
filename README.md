@@ -1,1 +1,1 @@
-# bigdata_experiments
+# bigdata_hypertable
